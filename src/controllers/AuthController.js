@@ -45,8 +45,8 @@ class AuthController {
             //Gửi refresh token vào cookie
             res.cookie('refreshToken', refreshToken, {
                 httpOnly:true,
-                secure: false,
-                sameSite: "lax",
+                secure: true,
+                sameSite: "none",
                 path: "/",
                 maxAge: 7 * 24 * 60 * 60 * 1000
             })
