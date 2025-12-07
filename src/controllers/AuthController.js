@@ -80,20 +80,23 @@ class AuthController {
                 return res.status(401).json({ message: "No refresh token provided" });
             }
 
-            //Verify xem có hợp lệ không
-            jwt.verify (token, process.env.REFRESH_TOKEN, (err, decoded) => {
-                if (err)
-                    {
-                        console.log("Invalid refresh token");
-                        return res.status(401).json({ message: "Invalid refresh token" });
+            const decoded = await new Promise((resolve, reject) => {
+                // jwt.verify chạy không đồng bộ (asynchronously)
+                jwt.verify(token, process.env.REFRESH_TOKEN, (err, decoded) => {
+                    if (err) {
+                        console.log("Invalid refresh token:", err.message);
+                        // Nếu xác minh thất bại, gửi lỗi ra ngoài khối await
+                        return reject(new Error("Invalid refresh token")); 
                     }
+                    // Nếu xác minh thành công, trả về decoded payload
+                    resolve(decoded);
+                });
+            }); // Kết thúc Promise
 
-                    
-
-                //Nếu refresh token hợp lệ thì tạo access token mới
-                const accessToken = createAccessToken({id: decoded.id})
-                return res.status(200).json({ accessToken });
-            })
+            // Dòng code này chỉ chạy khi Promise đã được resolve thành công
+            // Nếu refresh token hợp lệ thì tạo access token mới
+            const accessToken = createAccessToken({ id: decoded.id });
+            return res.status(200).json({ accessToken });
         }
         catch (error) {
             res.status(500).json({ error: error.message });
