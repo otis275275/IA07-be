@@ -1,13 +1,18 @@
 import jwt from "jsonwebtoken";
 
-//middleware xác thực xem có access token hợp lệ hay không
+// middleware xác thực xem có access token hợp lệ hay không
 export default function authorize(req, res, next) {
-    const authHeader = req.headers.authorization.split(' ')[1];
-    if (!authHeader) {
-        return res.status(401).json({ message: "Người dùng chưa được xác nhập, thiếu access token" });
+    // SỬA LỖI: Kiểm tra sự tồn tại của header trước khi gọi split
+    const authorization = req.headers.authorization; 
+    
+    if (!authorization || !authorization.startsWith('Bearer ')) {
+        return res.status(401).json({ message: "Người dùng chưa được xác thực, thiếu access token hoặc định dạng sai" });
     }
 
-    //Decode ở đây là payload lúc sign token
+    // Tách token
+    const authHeader = authorization.split(' ')[1]; 
+
+    // Decode ở đây là payload lúc sign token
     jwt.verify(authHeader, process.env.ACCESS_TOKEN, (err, decoded) => {
         if (err) {
             if (err.name === 'TokenExpiredError') {
@@ -26,6 +31,6 @@ export default function authorize(req, res, next) {
         }
         req.userId = decoded.id;
         next();
-    })
-
+    }); // Lỗi của jwt.verify được xử lý trong callback, không cần try/catch bên ngoài.
+    
 }

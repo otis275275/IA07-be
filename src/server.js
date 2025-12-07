@@ -10,7 +10,8 @@ const app = express();
 // 1. Cấu hình CORS (Phải đặt TRƯỚC khi định nghĩa routes)
 
 const allowedOrigins = [
-    'https://ia-07-fe.vercel.app'
+    'https://ia-07-fe.vercel.app',
+    'http://localhost:5173'
 ];
 
 const corsOptions = {
