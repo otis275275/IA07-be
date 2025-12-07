@@ -11,7 +11,6 @@ const app = express();
 
 const allowedOrigins = [
     'https://ia-07-fe.vercel.app',
-    'http://localhost:5173'
 ];
 
 const corsOptions = {
