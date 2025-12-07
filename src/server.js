@@ -14,7 +14,16 @@ const allowedOrigins = [
 ];
 
 const corsOptions = {
-    origin: allowedOrigins, 
+    origin: function (origin, callback) {
+        // Kiểm tra xem Origin có phải là một trong các Origin được phép,
+        // HOẶC là request không có Origin (như Postman/cURL hoặc server-to-server request nội bộ).
+        if (!origin || allowedOrigins.includes(origin)) {
+            callback(null, true);
+        } else {
+            // Nếu không được phép, trả về lỗi.
+            callback(new Error('Not allowed by CORS'));
+        }
+    }, 
     credentials: true, 
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization']
